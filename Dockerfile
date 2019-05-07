@@ -1,5 +1,5 @@
 FROM jupyter/minimal-notebook
-MAINTAINER Alexander Vogt <a.vogt@fulguritus.com>
+LABEL MAINTAINER Alexander Vogt <a.vogt@fulguritus.com>
 
 USER root
 
