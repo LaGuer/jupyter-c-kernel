@@ -1,6 +1,11 @@
 # Minimal C kernel for Jupyter
 
-## Use with Docker (recommended)
+## Use with MyyBinder (recommended)
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/LaGuer/jupyter-c-kernel/master)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/LaGuer/jupyter-c-kernel/master?urlpath=lab%2Ftree%2Fexample-notebook.ipynb)
+
+## Use with Docker 
 
  * `docker pull linexus/jupyter-c-kernel`
  * `docker run -p 8888:8888 linexus/jupyter-c-kernel`
