@@ -44,6 +44,10 @@ class RealTimeSubprocess(subprocess.Popen):
             queue.put(line)
         stream.close()
 
+    def wait_for_threads(self):
+        self._stdout_thread.join()
+        self._stderr_thread.join()
+
     def write_contents(self):
         """
         Write the available content from stdin and stderr where specified when the instance was created
@@ -71,7 +75,7 @@ class CKernel(Kernel):
     implementation_version = '1.0'
     language = 'c'
     language_version = 'C11'
-    language_info = {'name': 'c',
+    language_info = {'name': 'text/x-csrc',
                      'mimetype': 'text/plain',
                      'file_extension': '.c'}
     banner = "C kernel.\n" \
@@ -122,28 +126,40 @@ class CKernel(Kernel):
         magics = {'cflags': [],
                   'ldflags': [],
                   'args': []}
+        
+        # clean_code - code without cflags, ldflags & args
+        clean_code = ''
 
         for line in code.splitlines():
             if line.startswith('//%'):
+                clean_line = ''
                 key, value = line[3:].split(":", 2)
                 key = key.strip().lower()
-
+                
                 if key in ['ldflags', 'cflags']:
                     for flag in value.split():
                         magics[key] += [flag]
+                    code.replace(line, "")
                 elif key == "args":
                     # Split arguments respecting quotes
                     for argument in re.findall(r'(?:[^\s,"]|"(?:\\.|[^"])*")+', value):
                         magics['args'] += [argument.strip('"')]
+            else:
+                clean_line = line
+            
+            clean_code += clean_line + '\n'
 
-        return magics
+        # remove last line sign
+        clean_code = clean_code[:clean_code.rfind('\n')]
+
+        return magics, clean_code
 
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
 
-        magics = self._filter_magics(code)
+        magics, code = self._filter_magics(code)
 
-        with self.new_temp_file(suffix='.c') as source_file:
+        with self.new_temp_file(suffix='.c') as source_file:  
             source_file.write(code)
             source_file.flush()
             with self.new_temp_file(suffix='.out') as binary_file:
@@ -153,18 +169,21 @@ class CKernel(Kernel):
                 p.write_contents()
                 if p.returncode != 0:  # Compilation failed
                     self._write_to_stderr(
-                            "[C kernel] GCC exited with code {}, the executable will not be executed".format(
-                                    p.returncode))
+                        "[C kernel] GCC exited with code {}, the executable will not be executed".format(
+                            p.returncode))
                     return {'status': 'ok', 'execution_count': self.execution_count, 'payload': [],
                             'user_expressions': {}}
 
         p = self.create_jupyter_subprocess([self.master_path, binary_file.name] + magics['args'])
         while p.poll() is None:
             p.write_contents()
+
+        p.wait_for_threads()
         p.write_contents()
 
         if p.returncode != 0:
             self._write_to_stderr("[C kernel] Executable exited with code {}".format(p.returncode))
+
         return {'status': 'ok', 'execution_count': self.execution_count, 'payload': [], 'user_expressions': {}}
 
     def do_shutdown(self, restart):

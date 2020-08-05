@@ -2,8 +2,8 @@
 
 ## Use with Docker (recommended)
 
- * `docker pull brendanrius/jupyter-c-kernel`
- * `docker run -p 8888:8888 brendanrius/jupyter-c-kernel`
+ * `docker pull linexus/jupyter-c-kernel`
+ * `docker run -p 8888:8888 linexus/jupyter-c-kernel`
  * Copy the given URL containing the token, and browse to it. For instance:
  
  ```
@@ -49,7 +49,7 @@ that:
 ```bash
 git clone https://github.com/brendan-rius/jupyter-c-kernel.git
 cd jupyter-c-kernel
-docker run -v $(pwd):/jupyter/jupyter_c_kernel/ -p 8888:8888 brendanrius/jupyter-c-kernel
+docker run -v $(pwd):/tmp/jupyter_c_kernel/ -p 8888:8888 linexus/jupyter-c-kernel
 ```
 
 This clones the source, run the kernel, and binds the current folder (the one
