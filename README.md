@@ -1,6 +1,6 @@
 # Minimal C kernel for Jupyter
 
-## Use with MyyBinder (recommended)
+## Use with MyBinder (recommended)
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/LaGuer/jupyter-c-kernel/master)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/LaGuer/jupyter-c-kernel/master?urlpath=lab%2Ftree%2Fexample-notebook.ipynb)
